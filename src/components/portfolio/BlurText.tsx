@@ -25,7 +25,7 @@ const buildKeyframes = (
 
   const keyframes: Record<string, Array<string | number>> = {};
   keys.forEach(k => {
-    keyframes[k] = [from[k], ...steps.map(s => s[k])];
+    keyframes[k] = [from[k] ?? 0, ...steps.map(s => s[k] ?? from[k] ?? 0)];
   });
   return keyframes;
 };
@@ -53,7 +53,7 @@ const BlurText: React.FC<BlurTextProps> = ({
     if (!ref.current) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry?.isIntersecting) {
           setInView(true);
           observer.unobserve(ref.current as Element);
         }
@@ -107,7 +107,7 @@ const BlurText: React.FC<BlurTextProps> = ({
             initial={false}
             animate={reducedMotion ? { opacity: 1, filter: 'blur(0px)', y: 0 } : inView ? animateKeyframes : { opacity: 1, filter: 'blur(0px)', y: 0 }}
             transition={spanTransition}
-            onAnimationComplete={index === elements.length - 1 ? onAnimationComplete : undefined}
+            {...(index === elements.length - 1 && onAnimationComplete ? { onAnimationComplete } : {})}
             style={{
               display: 'inline-block',
               willChange: 'transform, filter, opacity'
